@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional
 public class CategoryService {
-
+    //
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
