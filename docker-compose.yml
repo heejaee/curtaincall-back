@@ -27,7 +27,7 @@ services:
       - "6379:6379"
 
   backend:
-    image: keeyongham/curtaincall:backend
+    image: heejae/curtaincall:backend
     container_name: backend
     ports:
       - "8080:8080"
@@ -39,7 +39,7 @@ services:
       - zookeeper
 
   frontend:
-    image: keeyongham/curtaincall:frontend
+    image: heejae/curtaincall:frontend
     container_name: frontend
     ports:
       - "80:80"
