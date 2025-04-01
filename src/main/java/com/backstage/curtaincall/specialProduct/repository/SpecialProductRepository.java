@@ -29,7 +29,7 @@ public class SpecialProductRepository {
                 .getResultList();
     }
 
-    // 활성 (ACTIVE) 상태의 특가상품 조회2
+    // 활성 (ACTIVE) 상태의 특가상품 조회
     public List<SpecialProduct> findAllActive() {
         return em.createQuery(
                         "SELECT sp FROM SpecialProduct sp JOIN FETCH sp.product p " +
