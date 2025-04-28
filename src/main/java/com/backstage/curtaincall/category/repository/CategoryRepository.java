@@ -28,9 +28,11 @@ public interface CategoryRepository extends JpaRepository<Category,Long> {
     Optional<Category> findByIdDeleted(Long id);
 
     // 이름으로 Category 존재 여부 확인
-    @Query("select count(*)>0 from Category c where c.name =:name")
-    boolean existsByName(@Param("name") String name);
+//    @Query("select count(*)>0 from Category c where c.name =:name")
+//    boolean existsByName(@Param("name") String name);
 
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM categories WHERE name = :name AND is_deleted = false)", nativeQuery = true)
+    boolean existsByName(@Param("name") String name);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Category c SET c.deleted = true WHERE c.parent.id = :parentId")
