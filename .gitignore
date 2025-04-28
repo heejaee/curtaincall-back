@@ -7,6 +7,8 @@ build/
 
 ## application yml##
 /src/main/resources/application.yml
+/src/main/resources/application-test.yml
+
 
 ### STS ###
 .apt_generated
