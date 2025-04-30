@@ -1,19 +1,18 @@
 package com.backstage.curtaincall.category.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.backstage.curtaincall.category.domain.Category;
+import com.backstage.curtaincall.category.service.CategoryService;
 import jakarta.persistence.EntityManager;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Slf4j
@@ -23,6 +22,7 @@ class CategoryRepositoryTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+
     @Autowired
     private EntityManager em;
 
@@ -31,7 +31,7 @@ class CategoryRepositoryTest {
     void findAllNotDeleted() {
         // given
         Category category1 = Category.builder().name("Book").deleted(false).build();
-        Category category2 = Category.builder().name("Movie").deleted(true).build(); // deleted
+        Category category2 = Category.builder().name("Movie").deleted(true).build();
         categoryRepository.save(category1);
         categoryRepository.save(category2);
 
@@ -62,8 +62,11 @@ class CategoryRepositoryTest {
     @DisplayName("삭제된 Category 전체 조회")
     void findAllDeleted() {
         // given
-        Category category = Category.builder().name("Drama").deleted(true).build();
-        categoryRepository.save(category);
+        Category category1 = Category.builder().name("Book").deleted(false).build();
+        Category category2 = Category.builder().name("Drama").deleted(true).build();
+
+        categoryRepository.save(category1);
+        categoryRepository.save(category2);
 
         // when
         List<Category> categories = categoryRepository.findAllDeleted();
@@ -88,45 +91,7 @@ class CategoryRepositoryTest {
         assertThat(found.get().getName()).isEqualTo("Comedy");
     }
 
-//    @Test
-//    @DisplayName("Category 이름으로 존재 여부 확인")
-//    void existsByName() {
-//        // given
-//        Category category = Category.builder().name("Travel").deleted(false).build();
-//        categoryRepository.save(category);
-//
-//        long startTime = System.currentTimeMillis(); // 시간 측정 시작
-//
-//        // when
-//        boolean exists = categoryRepository.existsByName("Travel");
-//
-//        long endTime = System.currentTimeMillis(); // 시간 측정 끝
-//
-//        // then
-//        assertThat(exists).isTrue();
-//
-//        log.info("existsByName() 실행 시간: {}ms", (endTime - startTime)); // 로그 출력
-//    }
-//
-//    @Test
-//    @DisplayName("Category 이름으로 존재 여부 확인")
-//    void existsByName2() {
-//        // given
-//        Category category = Category.builder().name("Travel").deleted(false).build();
-//        categoryRepository.save(category);
-//
-//        long startTime = System.currentTimeMillis(); // 시간 측정 시작
-//
-//        // when
-//        boolean exists = categoryRepository.existsByName2("Travel");
-//
-//        long endTime = System.currentTimeMillis(); // 시간 측정 끝
-//
-//        // then
-//        assertThat(exists).isTrue();
-//
-//        log.info("existsByName() 실행 시간: {}ms", (endTime - startTime)); // 로그 출력
-//    }
+
 
     @Test
     @DisplayName("Category 이름으로 존재 여부 비교 테스트")
@@ -180,47 +145,48 @@ class CategoryRepositoryTest {
         assertThat(exists).isFalse();
     }
 
-//    @Test
-//    @DisplayName("부모 ID로 하위 Category soft delete")
-//    void softDeleteChildren() {
-//        // given
-//        Category parent = Category.builder().name("Parent").deleted(false).build();
-//        Category savedParent = categoryRepository.save(parent);
-//
-//        Category child = Category.builder().name("Child").deleted(false).build();
-//        child.setParent(savedParent);
-//        categoryRepository.save(child);
-//
-//        // when
-//        categoryRepository.softDeleteChildren(savedParent.getId());
-//        entityManager.flush();
-//        entityManager.clear();
-//
-//        // then
-//        List<Category> children = categoryRepository.findAll();
-//        assertThat(children.get(1).isDeleted()).isTrue();
-//    }
-//
-//    @Test
-//    @DisplayName("부모 ID로 하위 Category 복구")
-//    void restoreChildren() {
-//        // given
-//        Category parent = Category.builder().name("Parent").deleted(false).build();
-//        Category savedParent = categoryRepository.save(parent);
-//
-//        Category child = Category.builder().name("Child").deleted(true).build();
-//        child.setParent(savedParent);
-//        categoryRepository.save(child);
-//
-//        // when
-//        categoryRepository.restoreChildren(savedParent.getId());
-//        entityManager.flush();
-//        entityManager.clear();
-//
-//        // then
-//        List<Category> children = categoryRepository.findAll();
-//        assertThat(children.get(1).isDeleted()).isFalse();
-//    }
+    @Test
+    @DisplayName("부모 ID로 하위 Category soft delete")
+    void softDeleteChildren() {
+        // given
+        Category parent = Category.builder().name("Parent").deleted(false).build();
+        Category savedParent = categoryRepository.save(parent);
+
+        Category child = Category.builder().name("Child").deleted(false).build();
+        savedParent.addChild(child);
+        categoryRepository.save(child);
+
+
+        // when
+        categoryRepository.softDeleteChildren(savedParent.getId());
+        em.flush();
+        em.clear();
+
+        // then
+        List<Category> children = categoryRepository.findAll();
+        assertThat(children.get(1).isDeleted()).isTrue();
+    }
+
+    @Test
+    @DisplayName("부모 ID로 하위 Category 복구")
+    void restoreChildren() {
+        // given
+        Category parent = Category.builder().name("Parent").deleted(false).build();
+        Category savedParent = categoryRepository.save(parent);
+
+        Category child = Category.builder().name("Child").deleted(false).build();
+        savedParent.addChild(child);
+        categoryRepository.save(child);
+
+        // when
+        categoryRepository.restoreChildren(savedParent.getId());
+        em.flush();
+        em.clear();
+
+        // then
+        List<Category> children = categoryRepository.findAll();
+        assertThat(children.get(1).isDeleted()).isFalse();
+    }
 
     @Test
     @DisplayName("Category 이름으로 단건 조회")
@@ -236,4 +202,5 @@ class CategoryRepositoryTest {
         assertThat(found).isPresent();
         assertThat(found.get().getName()).isEqualTo("Fashion");
     }
+
 }
