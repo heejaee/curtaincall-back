@@ -1,5 +1,7 @@
 package com.backstage.curtaincall.category.service;
 
+import static com.backstage.curtaincall.global.exception.CustomErrorCode.*;
+
 import com.backstage.curtaincall.category.domain.Category;
 import com.backstage.curtaincall.category.dto.CategoryDto;
 import com.backstage.curtaincall.category.repository.CategoryRepository;
@@ -49,11 +51,11 @@ public class CategoryService {
         // 자식 카테고리인 경우 부모 설정
         if (parentId != null) {
             Category parent = categoryRepository.findByIdNotDeleted(parentId)
-                    .orElseThrow(() -> new CustomException(CustomErrorCode.CATEGORY_NOT_FOUND));
+                    .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 
             // 루트 카테고리가 아닌 곳에서 카테고리를 추가하는 경우 오류 발생
             if (!parent.isRootCategory()) {
-                throw new CustomException(CustomErrorCode.INVALID_CATEGORY_OPERATION);
+                throw new CustomException(INVALID_CATEGORY_OPERATION);
             }
 
             parent.addChild(category);
@@ -69,26 +71,26 @@ public class CategoryService {
         validateCategoryName(escapedName);
 
         Category category = categoryRepository.findByIdNotDeleted(id)
-                .orElseThrow(() -> new CustomException(CustomErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 
         category.updateName(escapedName);
         return categoryRepository.save(category).toDto();
     }
 
-    private void validateCategoryName(String escapedName) {
+    private void validateCategoryName(String escapedName) throws CustomException {
         if (escapedName == null || escapedName.trim().isEmpty()) {
-            throw new CustomException(CustomErrorCode.INVALID_CATEGORY_NAME);
+            throw new CustomException(INVALID_CATEGORY_NAME);
         }
 
         // 이미 이름이 있다면 중복 예외 발생
         if (categoryRepository.existsByName(escapedName)) {
-            throw new CustomException(CustomErrorCode.DUPLICATED_CATEGORY_NAME);
+            throw new CustomException(DUPLICATED_CATEGORY_NAME);
         }
     }
 
     public void delete(Long id) {
         Category category = categoryRepository.findByIdNotDeleted(id)
-                .orElseThrow(() -> new CustomException(CustomErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 
         // 자신 삭제
         category.delete();
@@ -101,7 +103,7 @@ public class CategoryService {
 
     public void restore(Long id) {
         Category category = categoryRepository.findByIdDeleted(id)
-                .orElseThrow(() -> new CustomException(CustomErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 
         category.restore();
         if (category.isRootCategory()) {
