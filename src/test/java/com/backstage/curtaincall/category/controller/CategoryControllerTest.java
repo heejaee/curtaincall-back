@@ -2,8 +2,6 @@ package com.backstage.curtaincall.category.controller;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -26,7 +24,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(
@@ -87,7 +84,7 @@ class CategoryControllerTest {
         // Given
         CategoryDto input = new CategoryDto(null, null, "NewCategory", false);
         CategoryDto saved = CategoryDto.builder().id(10L).parentId(null).name("NewCategory").deleted(false).build();
-        given(categoryService.save(eq("NewCategory"), isNull())).willReturn(saved);
+        given(categoryService.save("NewCategory", null)).willReturn(saved);
 
         // When & Then
         mockMvc.perform(post("/api/v1/categories")
@@ -102,7 +99,7 @@ class CategoryControllerTest {
     @DisplayName("카테고리 생성 시 이름 누락으로 유효성 검증 실패")
     void create_withInvalidName_returnsBadRequest() throws Exception {
         // Given
-        CategoryDto invalidDto = new CategoryDto(null, null, "", false); // name is blank
+        CategoryDto invalidDto = new CategoryDto(null, null, "", false);
 
         // When & Then
         mockMvc.perform(post("/api/v1/categories")
@@ -117,7 +114,7 @@ class CategoryControllerTest {
         // Given
         CategoryDto input = new CategoryDto(10L, null, "UpdatedName", false);
         CategoryDto updated = CategoryDto.builder().id(10L).parentId(null).name("UpdatedName").deleted(false).build();
-        given(categoryService.update(eq("UpdatedName"), eq(10L))).willReturn(updated);
+        given(categoryService.update("UpdatedName", 10L)).willReturn(updated);
 
         // When & Then
         mockMvc.perform(put("/api/v1/categories")
