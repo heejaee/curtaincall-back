@@ -8,6 +8,7 @@ import com.backstage.curtaincall.specialProduct.dto.SpecialProductDto;
 import com.backstage.curtaincall.specialProduct.entity.SpecialProduct;
 import com.backstage.curtaincall.specialProduct.entity.SpecialProductStatus;
 import com.backstage.curtaincall.specialProduct.service.SpecialProductService;
+import com.backstage.curtaincall.specialProduct.validator.SpecialProductValidator;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +21,13 @@ import org.springframework.stereotype.Component;
 public class SpecialProductUpdateHandler {
 
     private final SpecialProductService specialProductService;
+    private final SpecialProductValidator specialProductValidator;
+
 
     @Transactional
     public void update(SpecialProductDto dto) {
 
-        specialProductService.validate(dto);
+        specialProductValidator.validate(dto);
         SpecialProduct sp = specialProductService.findById(dto.getSpecialProductId());
 
         if (dto.getStatus() == SpecialProductStatus.ACTIVE) {
@@ -47,7 +50,7 @@ public class SpecialProductUpdateHandler {
 
         for (SpecialProduct sp : specialProducts) {
             SpecialProductDto updatedDto = sp.toUpdatedDto(updatedProduct);
-            specialProductService.validateOverDate(updatedDto);
+            specialProductValidator.overDate(updatedDto);
 
             if (sp.getStatus() == SpecialProductStatus.ACTIVE) {
                 // 캐시 반영하여 변경
