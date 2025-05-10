@@ -1,8 +1,8 @@
 package com.backstage.curtaincall.recommend.service;
 
+import com.backstage.curtaincall.product.dto.ProductResponseDto;
 import com.backstage.curtaincall.product.entity.Product;
 import com.backstage.curtaincall.product.repository.ProductRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,8 +63,8 @@ public class UserRecommendService {
     }
 
     // 가장 많이 클릭한 카테고리의 인기 작품 추출
-    @Transactional
-    public List<Product> getRecommendedProductsByCategory(Long userId) {
+    @Transactional(readOnly = true)
+    public List<ProductResponseDto> getRecommendedProductsByCategory(Long userId) {
         // 가장 많이 클릭한 카테고리 가져오기
         Long mostClickedCategory = getMostClickedCategory(userId);
 
@@ -72,11 +73,13 @@ public class UserRecommendService {
         }
 
         // 해당 카테고리에서 판매량이 높은 상품을 가져오기
-        return productRepository.findTop5ByCategoryIdOrderBySalesCountDesc(mostClickedCategory);
+        return productRepository.findTop5ByCategoryIdOrderBySalesCountDesc(mostClickedCategory).stream()
+                .map(ProductResponseDto::fromEntity) // 트랜잭션 안에서 DTO로 변환
+                .collect(Collectors.toList());
     }
 
-    @Transactional
-    public List<Product> getRecommendedProductsByChain(Long userId) {
+    @Transactional(readOnly = true)
+    public List<ProductResponseDto> getRecommendedProductsByChain(Long userId) {
         // 사용자가 가장 많이 클릭한 상품 찾기
         String userClicksKey = "user:clicks:products:" + userId;
         Map<Object, Object> clickedProducts = redisTemplate.opsForHash().entries(userClicksKey);
@@ -109,7 +112,12 @@ public class UserRecommendService {
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
 
-        return productRepository.findAllById(productIds);
+        return productRepository.findAllById(productIds).stream()
+                .map(ProductResponseDto::fromEntity)
+                .collect(Collectors.toList());
     }
+
+
+
 
 }
