@@ -63,6 +63,10 @@ services:
       - mongo
       - redis
       - kafka
+    environment:
+      - TZ=Asia/Seoul
+    command: [ "java", "-Duser.timezone=Asia/Seoul", "-Dspring.profiles.active=prod", "-jar", "/app/curtaincall.jar" ]
+
     networks:
       - curtaincall-net
 
