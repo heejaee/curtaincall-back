@@ -1,0 +1,8 @@
+FROM mysql:9.2
+
+COPY ./dump.sql /docker-entrypoint-initdb.d/
+
+ENV MYSQL_ROOT_PASSWORD=mysecretpassword
+ENV MYSQL_DATABASE=curtaincall
+ENV MYSQL_USER=user
+ENV MYSQL_PASSWORD=passw0rd
