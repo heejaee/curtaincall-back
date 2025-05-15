@@ -32,16 +32,14 @@ public class CustomExHandler {
     // NullPointerException 처리
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<CustomExResponse> handleNullPointerException(NullPointerException e) {
-        log.error("NullPointerException: {}", e.getMessage());
-
-        return CustomExResponse.toResponse(CustomErrorCode.NPE, e.getMessage());
+        log.error("NullPointerException", e);
+        return CustomExResponse.toResponse(CustomErrorCode.NPE);
     }
 
     // 그 외 모든 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CustomExResponse> handleException(Exception e) {
-        log.error("Exception: {}", e.getMessage());
-
-        return CustomExResponse.toResponse(CustomErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
+        log.error("Exception", e);
+        return CustomExResponse.toResponse(CustomErrorCode.INTERNAL_SERVER_ERROR);
     }
 }
