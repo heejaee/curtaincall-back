@@ -118,7 +118,7 @@ public class SpecialProductService {
 
 
     // 생성
-    @Transactional
+//    @Transactional
     public SpecialProductDto save(SpecialProductDto dto) {
         // 통합 검증 메서드
         specialProductValidator.validate(dto);

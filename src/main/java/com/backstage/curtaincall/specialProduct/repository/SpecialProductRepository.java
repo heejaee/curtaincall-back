@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -158,10 +159,29 @@ public class SpecialProductRepository {
                 .findFirst();
     }
 
-    public void save(SpecialProduct specialProduct) {
-        em.persist(specialProduct);
-    }
+//    public void save(SpecialProduct specialProduct) {
+//        em.persist(specialProduct);
+//    }
 
+    private final JdbcTemplate jdbcTemplate;
+
+    public void save(SpecialProduct specialProduct) {
+        jdbcTemplate.update("""
+            INSERT INTO special_products (
+                product_id,
+                discount_rate,
+                start_date,
+                end_date,
+                status
+            ) VALUES (?, ?, ?, ?, ?)
+        """,
+                specialProduct.getProduct().getProductId(),
+                specialProduct.getDiscountRate(),
+                specialProduct.getStartDate(),
+                specialProduct.getEndDate(),
+                specialProduct.getStatus().name()
+        );
+    }
 
     public List<SpecialProduct> findAllStartingSpecialProducts(LocalDate today) {
         return em.createQuery(
