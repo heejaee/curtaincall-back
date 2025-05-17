@@ -103,21 +103,13 @@ public class SpecialProductService {
                 .toList();
     }
 
-    // 단건조회 (캐시 적용)
-    @Cacheable(cacheNames = "specialProductCache", key = "'specialProduct:' + #id", cacheManager = "cacheManager")
-    public SpecialProductDto findByIdWithProduct(Long id) {
-        SpecialProduct sp = specialProductRepository.findByIdWithProduct(id)
-                .orElseThrow(() -> new CustomException(SPECIAL_PRODUCT_NOT_FOUND));
-        return sp.toDto();
-    }
-
     //상품id와 관련된 모든 특가상품 가져오기
     public List<SpecialProduct> findAllByProductId(Long productId){
         return specialProductRepository.findAllByProductId(productId);
     }
 
 
-    // 생성
+    // 단건 생성
 //    @Transactional
     public SpecialProductDto save(SpecialProductDto dto) {
         // 통합 검증 메서드

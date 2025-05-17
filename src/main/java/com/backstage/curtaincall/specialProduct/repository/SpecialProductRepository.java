@@ -127,18 +127,6 @@ public class SpecialProductRepository {
                 .getResultList();
     }
 
-    public Optional<SpecialProduct> findByIdWithProduct(Long id) {
-        return em.createQuery(
-                        "SELECT sp FROM SpecialProduct sp " +
-                                "JOIN FETCH sp.product p " +
-                                "WHERE sp.id = :id AND sp.status <> :deleted", SpecialProduct.class)
-                .setParameter("id", id)
-                .setParameter("deleted", SpecialProductStatus.DELETED)
-                .getResultStream()
-                .findFirst();
-    }
-
-
     public Optional<SpecialProduct> findByIdUpcoming(Long id) {
         return em.createQuery(
                         "SELECT sp FROM SpecialProduct sp " +

@@ -29,11 +29,6 @@ public class SpecialProductController {
     private final SpecialProductDeleteHandler specialProductDeleteHandler;
 
 
-    // 전체 조회
-    @GetMapping
-    public List<SpecialProductDto> findAll() {
-        return specialProductService.findAll();
-    }
 
     // 메인화면
     // 캐싱된 특가상품 가져오기
@@ -58,11 +53,6 @@ public class SpecialProductController {
         return specialProductService.findAllDeleted();
     }
 
-    // 단건 조회
-    @GetMapping("{id}")
-    public SpecialProductDto findByIdWithProduct(@PathVariable Long id){
-        return specialProductService.findByIdWithProduct(id);
-    }
 
     // 생성
     @PostMapping
