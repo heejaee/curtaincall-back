@@ -80,7 +80,6 @@ public class SpecialProductService {
 
 
     // 이름 검색 및 페이지네이션을 적용한 전체 조회
-    @Transactional(readOnly = true)
     public Page<SpecialProductDto> getSpecialProducts(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SpecialProduct> spPage = specialProductRepository.findAll(keyword, pageable);
