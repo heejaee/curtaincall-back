@@ -45,14 +45,6 @@ public class SpecialProductService {
                 .orElseThrow(() -> new CustomException(SPECIAL_PRODUCT_NOT_FOUND));
     }
 
-    // 전체 조회
-    public List<SpecialProductDto> findAll(){
-        List<SpecialProduct> specialProducts = specialProductRepository.findAll();
-        return specialProducts.stream()
-                .map(SpecialProduct::toDto)
-                .toList();
-    }
-
     // Redis에서 캐시된 ACTIVE 특가상품 가져오기
     public List<SpecialProductDto> getActiveSpecialProducts() {
         ValueOperations<String, SpecialProductDto> valueOps = redisTemplate.opsForValue();
