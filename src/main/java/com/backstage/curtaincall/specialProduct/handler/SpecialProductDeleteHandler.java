@@ -16,6 +16,7 @@ public class SpecialProductDeleteHandler {
 
     private final SpecialProductService specialProductService;
 
+    // 단건 삭제
     @Transactional
     public void delete(Long specialProductId) {
         SpecialProduct sp = specialProductService.findById(specialProductId);
@@ -28,7 +29,7 @@ public class SpecialProductDeleteHandler {
         }
     }
 
-
+    // 상품 삭제시 연결된 모든 특가 상품을 삭제
     @Transactional
     public void deleteAllByProduct(Long productId) {
         List<SpecialProduct> specialProducts = specialProductService.findAllByProductId(productId);

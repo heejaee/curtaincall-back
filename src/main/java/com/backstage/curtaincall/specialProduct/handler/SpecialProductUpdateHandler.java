@@ -23,7 +23,7 @@ public class SpecialProductUpdateHandler {
     private final SpecialProductService specialProductService;
     private final SpecialProductValidator specialProductValidator;
 
-
+    // 단건 변경
     @Transactional
     public void update(SpecialProductDto dto) {
 
@@ -43,7 +43,7 @@ public class SpecialProductUpdateHandler {
     }
 
 
-    //  특정 상품(Product)에 연결된 모든 특가 상품을 업데이트
+    // 상품 변경시 연결된 모든 특가 상품을 업데이트
     @Transactional
     public void updateAllByProduct(Long productId, Product updatedProduct) {
         List<SpecialProduct> specialProducts = specialProductService.findAllByProductId(productId);

@@ -28,8 +28,6 @@ public class SpecialProductController {
     private final SpecialProductUpdateHandler specialProductUpdateHandler;
     private final SpecialProductDeleteHandler specialProductDeleteHandler;
 
-
-
     // 메인화면
     // 캐싱된 특가상품 가져오기
     @GetMapping("/active")
