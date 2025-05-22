@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -101,7 +100,6 @@ public class SpecialProductService {
 
 
     // 단건 생성
-//    @Transactional
     public SpecialProductDto save(SpecialProductDto dto) {
         // 통합 검증 메서드
         specialProductValidator.validate(dto);
@@ -115,19 +113,18 @@ public class SpecialProductService {
     }
 
     // 수정: 캐시 반영 O
-    @Transactional
     @CachePut(cacheNames = "specialProductCache", key = "'specialProduct:' + #dto.specialProductId", cacheManager = "cacheManager")
     public SpecialProductDto updateWithCache(SpecialProduct sp, SpecialProductDto dto) {
         sp.update(dto);
+        specialProductRepository.update(dto);
         return sp.toDto();
     }
 
     // 수정: 캐시 업데이트 반영 X
-    @Transactional
     public void updateWithOutCache(SpecialProduct sp, SpecialProductDto dto) {
         sp.update(dto);
+        specialProductRepository.update(dto);
     }
-
 
     // Soft 삭제 : 캐시 반영 O
     @Transactional

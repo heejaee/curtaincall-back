@@ -1,5 +1,6 @@
 package com.backstage.curtaincall.specialProduct.repository;
 
+import com.backstage.curtaincall.specialProduct.dto.SpecialProductDto;
 import com.backstage.curtaincall.specialProduct.entity.SpecialProduct;
 import com.backstage.curtaincall.specialProduct.entity.SpecialProductStatus;
 import jakarta.persistence.EntityManager;
@@ -169,6 +170,23 @@ public class SpecialProductRepository {
                 specialProduct.getEndDate(),
                 specialProduct.getStatus().name()
         );
+    }
+
+    public void update(SpecialProductDto dto) {
+        jdbcTemplate.update("""
+            UPDATE special_products
+            SET discount_rate = ?,
+                start_date = ?,
+                end_date = ?,
+                status = ?
+            WHERE special_product_id = ?
+        """,
+                    dto.getDiscountRate(),
+                    dto.getDiscountStartDate(),
+                    dto.getDiscountEndDate(),
+                    dto.getStatus().name(),
+                    dto.getSpecialProductId()
+            );
     }
 
     public List<SpecialProduct> findAllStartingSpecialProducts(LocalDate today) {
