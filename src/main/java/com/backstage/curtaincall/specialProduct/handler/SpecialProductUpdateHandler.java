@@ -24,7 +24,7 @@ public class SpecialProductUpdateHandler {
     private final SpecialProductValidator specialProductValidator;
 
     // 단건 변경
-    @Transactional
+//    @Transactional
     public void update(SpecialProductDto dto) {
 
         specialProductValidator.validate(dto);
