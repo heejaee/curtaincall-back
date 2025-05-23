@@ -22,6 +22,7 @@ public class SchedulerService {
     private final SpecialProductService specialProductService;
     private final SpecialProductDeleteHandler specialProductDeleteHandler;
 
+    @Transactional
     public void deleteExpiredSpecialProducts() {
         LocalDate today = LocalDate.now();
 
@@ -36,6 +37,7 @@ public class SchedulerService {
         }
     }
 
+    @Transactional
     public void approveStartingSpecialProducts() {
         LocalDate today = LocalDate.now();
         // 각 productId별 삭제되지 않은 특가상품 중 종료일이 가장 빠른 것이 상태가 할인 예정일때만 가져옴
