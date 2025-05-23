@@ -24,10 +24,9 @@ public class SpecialProductUpdateHandler {
     private final SpecialProductValidator specialProductValidator;
 
     // 단건 변경
-//    @Transactional
     public void update(SpecialProductDto dto) {
 
-        specialProductValidator.validate(dto);
+        specialProductValidator.validateUpdate(dto);
         SpecialProduct sp = specialProductService.findById(dto.getSpecialProductId());
 
         if (dto.getStatus() == SpecialProductStatus.ACTIVE) {

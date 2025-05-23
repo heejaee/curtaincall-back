@@ -16,7 +16,18 @@ public class SpecialProductValidator {
 
     private final SpecialProductRepository specialProductRepository;
 
-    public void validate(SpecialProductDto dto) {
+    public void validateUpdate(SpecialProductDto dto) {
+        // 할인 종료일이 할인 시작일보다 이전이면 오류발생
+        endDateBeforeStart(dto);
+        //할인 종료일이 오늘보다 적으면 오류발생
+        discountExpired(dto.getDiscountEndDate());
+        // 할인 날짜가 공연날짜 범위를 벗어나면 오류발생
+        overDate(dto);
+        //한 상품에 2개의 할인적용 날짜가 겹치면 오류발생
+        overLappingDate(dto);
+    }
+
+    public void validateSave(SpecialProductDto dto) {
         // 할인 종료일이 할인 시작일보다 이전이면 오류발생
         endDateBeforeStart(dto);
         //할인 시작일이나 할인 종료일이 오늘보다 적으면 오류발생
@@ -37,6 +48,13 @@ public class SpecialProductValidator {
     public void discountExpired(LocalDate discountStartDate, LocalDate discountEndDate) {
         LocalDate now = LocalDate.now();
         if (now.isAfter(discountStartDate) || now.isAfter(discountEndDate)) {
+            throw new CustomException(CustomErrorCode.CANNOT_APPLY_DISCOUNT_FOR_PAST_DATE);
+        }
+    }
+
+    public void discountExpired(LocalDate discountEndDate) {
+        LocalDate now = LocalDate.now();
+        if (now.isAfter(discountEndDate)) {
             throw new CustomException(CustomErrorCode.CANNOT_APPLY_DISCOUNT_FOR_PAST_DATE);
         }
     }

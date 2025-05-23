@@ -106,7 +106,7 @@ public class SpecialProductService {
     // 단건 생성
     public SpecialProductDto save(SpecialProductDto dto) {
         // 통합 검증 메서드
-        specialProductValidator.validate(dto);
+        specialProductValidator.validateSave(dto);
 
         Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
