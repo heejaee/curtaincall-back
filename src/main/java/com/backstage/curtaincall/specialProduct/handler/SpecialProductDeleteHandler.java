@@ -17,7 +17,6 @@ public class SpecialProductDeleteHandler {
     private final SpecialProductService specialProductService;
 
     // 단건 삭제
-    @Transactional
     public void delete(Long specialProductId) {
         SpecialProduct sp = specialProductService.findById(specialProductId);
         if (sp.getStatus() == SpecialProductStatus.ACTIVE) {

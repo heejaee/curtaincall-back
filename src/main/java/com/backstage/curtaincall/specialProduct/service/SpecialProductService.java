@@ -166,17 +166,22 @@ public class SpecialProductService {
 //    }
 
     // Soft 삭제 : 캐시 반영 O
-    @Transactional
     @CacheEvict(cacheNames = "specialProductCache", key = "'specialProduct:' + #sp.id", cacheManager = "cacheManager")
     public SpecialProductDto deleteWithCache(SpecialProduct sp) {
-        sp.delete();
-        return sp.toDto();
+        return executeInTransaction(() -> {
+            sp.delete();
+            specialProductRepository.delete(sp);
+            return sp.toDto();
+        });
     }
 
     // Soft 삭제 : 캐시 반영 X
-    @Transactional
     public void deleteWithOutCache(SpecialProduct sp) {
-        sp.delete();
+        executeInTransaction(() -> {
+            sp.delete();
+            specialProductRepository.delete(sp);
+            return null;
+        });
     }
 
     // 승인: 캐시에 복구된 엔티티 업데이트

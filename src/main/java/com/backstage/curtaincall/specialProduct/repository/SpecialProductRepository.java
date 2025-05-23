@@ -165,11 +165,11 @@ public class SpecialProductRepository {
                 status
             ) VALUES (?, ?, ?, ?, ?)
         """,
-                specialProduct.getProduct().getProductId(),
-                specialProduct.getDiscountRate(),
-                specialProduct.getStartDate(),
-                specialProduct.getEndDate(),
-                specialProduct.getStatus().name()
+            specialProduct.getProduct().getProductId(),
+            specialProduct.getDiscountRate(),
+            specialProduct.getStartDate(),
+            specialProduct.getEndDate(),
+            specialProduct.getStatus().name()
         );
     }
 
@@ -182,12 +182,20 @@ public class SpecialProductRepository {
                 status = ?
             WHERE special_product_id = ?
         """,
-                    dto.getDiscountRate(),
-                    dto.getDiscountStartDate(),
-                    dto.getDiscountEndDate(),
-                    dto.getStatus().name(),
-                    dto.getSpecialProductId()
-            );
+            dto.getDiscountRate(),
+            dto.getDiscountStartDate(),
+            dto.getDiscountEndDate(),
+            dto.getStatus().name(),
+            dto.getSpecialProductId());
+    }
+
+    public void delete (SpecialProduct sp) {
+        jdbcTemplate.update("""
+            UPDATE special_products
+            SET status = 'DELETED'
+            WHERE special_product_id = ?
+        """,
+        sp.getId());
     }
 
     public List<SpecialProduct> findAllStartingSpecialProducts(LocalDate today) {
