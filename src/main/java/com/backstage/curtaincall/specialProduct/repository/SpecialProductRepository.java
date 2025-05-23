@@ -97,7 +97,7 @@ public class SpecialProductRepository {
                         SpecialProduct.class)
                 .setParameter("id", id)
                 .setParameter("deleted", SpecialProductStatus.DELETED)
-                .getResultList() // ✅ 결과를 메모리에 먼저 다 올림
+                .getResultList()
                 .stream()
                 .findFirst();
     }

@@ -121,21 +121,22 @@ public class SpecialProductService {
     public <T> T executeInTransaction(Supplier<T> action) {
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
-        System.out.println("[트랜잭션 시작]");
+        log.info("[트랜잭션 시작]");
 
         try {
             T result = action.get(); // 실제 작업
-            System.out.println("[비즈니스 로직 실행됨]");
+            log.info("[비즈니스 로직 실행됨]");
             transactionManager.commit(status);
-            System.out.println("[커밋 완료]");
+            log.info("[커밋 완료]");
             return result;
         } catch (RuntimeException | Error e) {
             transactionManager.rollback(status);
-            System.out.println("[롤백 발생]");
+            log.info("[롤백 발생]");
             throw e;
         }
     }
 
+    // 수정: 캐시 반영 O
     @CachePut(cacheNames = "specialProductCache", key = "'specialProduct:' + #dto.specialProductId", cacheManager = "cacheManager")
     public SpecialProductDto updateWithCache(SpecialProduct sp, SpecialProductDto dto) {
         return executeInTransaction(() -> {
@@ -145,6 +146,7 @@ public class SpecialProductService {
         });
     }
 
+    // 수정: 캐시 업데이트 반영 X
     public void updateWithOutCache(SpecialProduct sp, SpecialProductDto dto) {
         executeInTransaction(() -> {
             sp.update(dto);
@@ -155,37 +157,17 @@ public class SpecialProductService {
 
 
     // 수정: 캐시 반영 O
+//    @Transactional
 //    @CachePut(cacheNames = "specialProductCache", key = "'specialProduct:' + #dto.specialProductId", cacheManager = "cacheManager")
 //    public SpecialProductDto updateWithCache(SpecialProduct sp, SpecialProductDto dto) {
-//        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-//
-//        try {
-//            sp.update(dto);
-//            specialProductRepository.update(dto);
-//            // 트랜잭션 커밋
-//            transactionManager.commit(status);
-//            return sp.toDto();
-//
-//        } catch (RuntimeException | Error e) {
-//            transactionManager.rollback(status);
-//            throw e;
-//        }
+//        sp.update(dto);
+//        return sp.toDto();
 //    }
 //
 //    // 수정: 캐시 업데이트 반영 X
+//    @Transactional
 //    public void updateWithOutCache(SpecialProduct sp, SpecialProductDto dto) {
-//        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-//
-//        try {
-//            sp.update(dto);
-//            specialProductRepository.update(dto);
-//            // 트랜잭션 커밋
-//            transactionManager.commit(status);
-//
-//        } catch (RuntimeException | Error e) {
-//            transactionManager.rollback(status);
-//            throw e;
-//        }
+//        sp.update(dto);
 //    }
 
     // Soft 삭제 : 캐시 반영 O
