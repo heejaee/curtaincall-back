@@ -120,18 +120,13 @@ public class SpecialProductService {
 
     public <T> T executeInTransaction(Supplier<T> action) {
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-
-        log.info("[트랜잭션 시작]");
-
+        
         try {
-            T result = action.get(); // 실제 작업
-            log.info("[비즈니스 로직 실행됨]");
+            T result = action.get(); // 비즈니스 로직 호출
             transactionManager.commit(status);
-            log.info("[커밋 완료]");
             return result;
         } catch (RuntimeException | Error e) {
             transactionManager.rollback(status);
-            log.info("[롤백 발생]");
             throw e;
         }
     }
