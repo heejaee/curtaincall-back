@@ -23,14 +23,6 @@ public class SpecialProductRepository {
     @PersistenceContext
     EntityManager em;
 
-    public List<SpecialProduct> findAll() {
-        return em.createQuery(
-                        "SELECT sp FROM SpecialProduct sp JOIN FETCH sp.product p " +
-                                "WHERE sp.status != :deleted", SpecialProduct.class)
-                .setParameter("deleted", SpecialProductStatus.DELETED)
-                .getResultList();
-    }
-
     // 활성 (ACTIVE) 상태의 특가상품 조회
     public List<SpecialProduct> findAllActive() {
         return em.createQuery(
@@ -131,7 +123,7 @@ public class SpecialProductRepository {
 
     public Optional<SpecialProduct> findByIdUpcoming(Long id) {
         return em.createQuery(
-                        "SELECT sp FROM SpecialProduct sp " +
+                        "SELECT sp FROM SpecialProduct sp JOIN FETCH sp.product p " +
                                 "WHERE sp.id = :id AND sp.status = :upcoming", SpecialProduct.class)
                 .setParameter("id", id)
                 .setParameter("upcoming", SpecialProductStatus.UPCOMING)
@@ -141,7 +133,7 @@ public class SpecialProductRepository {
 
     public Optional<SpecialProduct> findByIdActive(Long id) {
         return em.createQuery(
-                        "SELECT sp FROM SpecialProduct sp " +
+                        "SELECT sp FROM SpecialProduct sp JOIN FETCH sp.product p " +
                                 "WHERE sp.id = :id AND sp.status = :active", SpecialProduct.class)
                 .setParameter("id", id)
                 .setParameter("active", SpecialProductStatus.ACTIVE)
@@ -149,54 +141,6 @@ public class SpecialProductRepository {
                 .findFirst();
     }
 
-//    public void save(SpecialProduct specialProduct) {
-//        em.persist(specialProduct);
-//    }
-
-    private final JdbcTemplate jdbcTemplate;
-
-    public void save(SpecialProduct specialProduct) {
-        jdbcTemplate.update("""
-            INSERT INTO special_products (
-                product_id,
-                discount_rate,
-                start_date,
-                end_date,
-                status
-            ) VALUES (?, ?, ?, ?, ?)
-        """,
-            specialProduct.getProduct().getProductId(),
-            specialProduct.getDiscountRate(),
-            specialProduct.getStartDate(),
-            specialProduct.getEndDate(),
-            specialProduct.getStatus().name()
-        );
-    }
-
-    public void update(SpecialProductDto dto) {
-        jdbcTemplate.update("""
-            UPDATE special_products
-            SET discount_rate = ?,
-                start_date = ?,
-                end_date = ?,
-                status = ?
-            WHERE special_product_id = ?
-        """,
-            dto.getDiscountRate(),
-            dto.getDiscountStartDate(),
-            dto.getDiscountEndDate(),
-            dto.getStatus().name(),
-            dto.getSpecialProductId());
-    }
-
-    public void delete (SpecialProduct sp) {
-        jdbcTemplate.update("""
-            UPDATE special_products
-            SET status = 'DELETED'
-            WHERE special_product_id = ?
-        """,
-        sp.getId());
-    }
 
     public List<SpecialProduct> findAllStartingSpecialProducts(LocalDate today) {
         return em.createQuery(
@@ -237,5 +181,73 @@ public class SpecialProductRepository {
                 .setParameter("today", today)
                 .setParameter("deleted", SpecialProductStatus.DELETED)
                 .getResultList();
+    }
+
+
+//    public void save(SpecialProduct specialProduct) {
+//        em.persist(specialProduct);
+//    }
+
+    private final JdbcTemplate jdbcTemplate;
+
+    public void save(SpecialProduct specialProduct) {
+        jdbcTemplate.update("""
+            INSERT INTO special_products (
+                product_id,
+                discount_rate,
+                start_date,
+                end_date,
+                status
+            ) VALUES (?, ?, ?, ?, ?)
+        """,
+                specialProduct.getProduct().getProductId(),
+                specialProduct.getDiscountRate(),
+                specialProduct.getStartDate(),
+                specialProduct.getEndDate(),
+                specialProduct.getStatus().name()
+        );
+    }
+
+    public void update(SpecialProductDto dto) {
+        jdbcTemplate.update("""
+            UPDATE special_products
+            SET discount_rate = ?,
+                start_date = ?,
+                end_date = ?,
+                status = ?
+            WHERE special_product_id = ?
+        """,
+                dto.getDiscountRate(),
+                dto.getDiscountStartDate(),
+                dto.getDiscountEndDate(),
+                dto.getStatus().name(),
+                dto.getSpecialProductId());
+    }
+
+    public void delete (SpecialProduct sp) {
+        jdbcTemplate.update("""
+            UPDATE special_products
+            SET status = 'DELETED'
+            WHERE special_product_id = ?
+        """,
+                sp.getId());
+    }
+
+    public void approve(SpecialProduct sp) {
+        jdbcTemplate.update("""
+            UPDATE special_products
+            SET status = 'ACTIVE'
+            WHERE special_product_id = ?
+        """,
+                sp.getId());
+    }
+
+    public void approveCancel(SpecialProduct sp) {
+        jdbcTemplate.update("""
+            UPDATE special_products
+            SET status = 'UPCOMING'
+            WHERE special_product_id = ?
+        """,
+                sp.getId());
     }
 }

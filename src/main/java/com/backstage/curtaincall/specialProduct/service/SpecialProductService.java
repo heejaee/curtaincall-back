@@ -150,21 +150,6 @@ public class SpecialProductService {
         });
     }
 
-
-    // 수정: 캐시 반영 O
-//    @Transactional
-//    @CachePut(cacheNames = "specialProductCache", key = "'specialProduct:' + #dto.specialProductId", cacheManager = "cacheManager")
-//    public SpecialProductDto updateWithCache(SpecialProduct sp, SpecialProductDto dto) {
-//        sp.update(dto);
-//        return sp.toDto();
-//    }
-//
-//    // 수정: 캐시 업데이트 반영 X
-//    @Transactional
-//    public void updateWithOutCache(SpecialProduct sp, SpecialProductDto dto) {
-//        sp.update(dto);
-//    }
-
     // Soft 삭제 : 캐시 반영 O
     @CacheEvict(cacheNames = "specialProductCache", key = "'specialProduct:' + #sp.id", cacheManager = "cacheManager")
     public SpecialProductDto deleteWithCache(SpecialProduct sp) {
@@ -184,32 +169,34 @@ public class SpecialProductService {
         });
     }
 
-    // 승인: 캐시에 복구된 엔티티 업데이트
-    @Transactional
     @CachePut(cacheNames = "specialProductCache", key = "'specialProduct:' + #id", cacheManager = "cacheManager")
     public SpecialProductDto approve(Long id) {
-        SpecialProduct sp = specialProductRepository.findByIdUpcoming(id)
-                .orElseThrow(() -> new CustomException(UPCOMING_SPECIAL_PRODUCT_NOT_FOUND));
 
-        // 이미 같은 Product에 ACTIVE 상태의 특가 상품이 있는지 확인
-        specialProductValidator.alreadyActiveProduct(sp.getProduct().getProductId());
+        return executeInTransaction(() -> {
+            SpecialProduct sp = specialProductRepository.findByIdUpcoming(id)
+                    .orElseThrow(() -> new CustomException(UPCOMING_SPECIAL_PRODUCT_NOT_FOUND));
 
-        //할인 시작일이나 할인 종료일이 오늘보다 적으면 오류발생
-        specialProductValidator.discountExpired(sp.getStartDate(),sp.getEndDate());
+            // 이미 같은 Product에 ACTIVE 상태의 특가 상품이 있는지 확인
+            specialProductValidator.alreadyActiveProduct(sp.getProduct().getProductId());
 
-        sp.approve();
-        return sp.toDto();
+            //할인 시작일이나 할인 종료일이 오늘보다 적으면 오류발생
+            specialProductValidator.discountExpired(sp.getStartDate(),sp.getEndDate());
+
+            sp.approve();
+            specialProductRepository.approve(sp);
+            return sp.toDto();
+        });
     }
 
-
-    //승인 취소
-    @Transactional
     @CacheEvict(cacheNames = "specialProductCache", key = "'specialProduct:' + #id", cacheManager = "cacheManager")
     public SpecialProductDto approveCancel(Long id) {
-        SpecialProduct sp = specialProductRepository.findByIdActive(id)
-                .orElseThrow(() -> new CustomException(SPECIAL_PRODUCT_NOT_FOUND));
+        return executeInTransaction(() -> {
+            SpecialProduct sp = specialProductRepository.findByIdActive(id)
+                    .orElseThrow(() -> new CustomException(SPECIAL_PRODUCT_NOT_FOUND));
 
-        sp.approveCancel();// 다시 할인 예정 상태로 변경
-        return sp.toDto();
+            sp.approveCancel();// 다시 할인 예정 상태로 변경
+            specialProductRepository.approveCancel(sp);
+            return sp.toDto();
+        });
     }
 }
