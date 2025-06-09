@@ -103,18 +103,18 @@ public class SpecialProductRepository {
                 .getResultList();
     }
 
-    public List<SpecialProduct> findAllOverlappingDates(Long productId, Long excludeId, LocalDate newStartDate, LocalDate newEndDate) {
+    public List<SpecialProduct> findAllOverlappingDates(Long productId, Long selfId, LocalDate newStartDate, LocalDate newEndDate) {
         return em.createQuery(
                         "SELECT sp FROM SpecialProduct sp " +
                                 "WHERE sp.product.id = :productId " +
                                 "AND sp.status != :deleted " +
-                                "AND (:excludeId IS NULL OR sp.id <> :excludeId) " +
+                                "AND (:selfId IS NULL OR sp.id <> :selfId) " +
                                 "AND ((sp.startDate BETWEEN :newStartDate AND :newEndDate) " +
                                 "OR (sp.endDate BETWEEN :newStartDate AND :newEndDate) " +
                                 "OR (sp.startDate <= :newStartDate AND sp.endDate >= :newEndDate) " +
                                 "OR (sp.startDate >= :newStartDate AND sp.endDate <= :newEndDate))", SpecialProduct.class)
                 .setParameter("productId", productId)
-                .setParameter("excludeId", excludeId)
+                .setParameter("selfId", selfId) // 자기 자신은 비교 대상에서 제외
                 .setParameter("newStartDate", newStartDate)
                 .setParameter("newEndDate", newEndDate)
                 .setParameter("deleted", SpecialProductStatus.DELETED)
