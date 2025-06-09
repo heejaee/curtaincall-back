@@ -63,7 +63,6 @@ public class SpecialProductRepositoryTest {
                 .build();
         this.product = productRepository.save(product);
 
-        // 영속성 컨텍스트 초기화
         em.flush();
         em.clear();
     }
@@ -112,7 +111,7 @@ public class SpecialProductRepositoryTest {
     }
 
     @Test
-    @DisplayName("키워드와 페이지네이션을 적용한 조회")
+    @DisplayName("이름과 페이지네이션을 적용한 조회")
     void findAll() {
         // given: 서로 다른 productName을 가진 Product 세 건 저장하여 SpecialProduct 연결
         Product productA = Product.builder()
@@ -137,7 +136,7 @@ public class SpecialProductRepositoryTest {
                 .build();
         productB = productRepository.save(productB);
 
-        Product alphaP = Product.builder()
+        Product alphaP = Product.builder() // 다른 이름 저장
                 .productName("alphaP")
                 .category(category)
                 .place("장소C")
@@ -250,7 +249,7 @@ public class SpecialProductRepositoryTest {
         // then: DELETED가 아닌 것만 반환 (sp2)
         assertThat(specialProducts).hasSize(1)
                 .first()
-                .extracting(sp -> sp.getStatus())
+                .extracting(SpecialProduct::getStatus)
                 .isEqualTo(SpecialProductStatus.UPCOMING);
     }
 
