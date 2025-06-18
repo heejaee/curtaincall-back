@@ -2,6 +2,7 @@ package com.backstage.curtaincall.specialProduct.controller;
 
 import com.backstage.curtaincall.specialProduct.dto.SpecialProductDto;
 import com.backstage.curtaincall.specialProduct.handler.SpecialProductDeleteHandler;
+import com.backstage.curtaincall.specialProduct.scheduler.SchedulerService;
 import com.backstage.curtaincall.specialProduct.service.SpecialProductService;
 import com.backstage.curtaincall.specialProduct.handler.SpecialProductUpdateHandler;
 import jakarta.validation.Valid;
@@ -27,6 +28,8 @@ public class SpecialProductController {
     private final SpecialProductService specialProductService;
     private final SpecialProductUpdateHandler specialProductUpdateHandler;
     private final SpecialProductDeleteHandler specialProductDeleteHandler;
+    private final SchedulerService schedulerService;
+
 
     // 메인화면
     // 캐싱된 특가상품 가져오기
@@ -79,5 +82,18 @@ public class SpecialProductController {
     @PutMapping("/approveCancel/{id}")
     public void approveCancel(@PathVariable Long id) {
         specialProductService.approveCancel(id);
+    }
+
+    //== 스케줄러 기능 ==
+    // 만료된 특가상품 삭제
+    @PostMapping("/deleteExpired")
+    public void deleteExpiredSpecialProducts() {
+        schedulerService.deleteExpiredSpecialProducts();
+    }
+
+    // 시작할 특가상품 승인
+    @PostMapping("/approveStarting")
+    public void approveStartingSpecialProducts() {
+        schedulerService.approveStartingSpecialProducts();
     }
 }
