@@ -93,7 +93,6 @@ services:
       [
         "java",
         "-Duser.timezone=Asia/Seoul",
-        "-Dserver.port=8081",
         "-Dspring.profiles.active=prod",
         "-jar",
         "/app/scheduler.jar"
