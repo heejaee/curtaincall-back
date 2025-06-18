@@ -66,7 +66,6 @@ services:
     environment:
       - TZ=Asia/Seoul
     command: [ "java", "-Duser.timezone=Asia/Seoul", "-Dspring.profiles.active=prod", "-jar", "/app/curtaincall.jar" ]
-
     networks:
       - curtaincall-net
 
@@ -77,6 +76,28 @@ services:
       - "80:80"
     depends_on:
       - backend
+    networks:
+      - curtaincall-net
+
+  scheduler:
+    image: hjhjhj3770/curtaincall:scheduler
+    container_name: scheduler
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+      - backend
+    environment:
+      - TZ=Asia/Seoul
+    command:
+      [
+        "java",
+        "-Duser.timezone=Asia/Seoul",
+        "-Dserver.port=8081",
+        "-Dspring.profiles.active=prod",
+        "-jar",
+        "/app/scheduler.jar"
+      ]
     networks:
       - curtaincall-net
 
