@@ -11,7 +11,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 @EnableJpaAuditing
 @SpringBootApplication
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
-@EnableScheduling
+//@EnableScheduling
 public class CurtaincallApplication {
 
     public static void main(String[] args) {
