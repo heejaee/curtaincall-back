@@ -1,8 +1,6 @@
 package com.backstage.curtaincall.specialProduct.scheduler;
 
-import com.backstage.curtaincall.global.exception.CustomException;
 import com.backstage.curtaincall.specialProduct.entity.SpecialProduct;
-import com.backstage.curtaincall.specialProduct.entity.SpecialProductStatus;
 import com.backstage.curtaincall.specialProduct.handler.SpecialProductDeleteHandler;
 import com.backstage.curtaincall.specialProduct.repository.SpecialProductRepository;
 import com.backstage.curtaincall.specialProduct.service.SpecialProductService;
@@ -37,7 +35,7 @@ public class SchedulerService {
         }
     }
 
-    @Transactional
+//    @Transactional
     public void approveStartingSpecialProducts() {
         LocalDate today = LocalDate.now();
         // 각 productId별 삭제되지 않은 특가상품 중 종료일이 가장 빠른 것이 상태가 할인 예정일때만 가져옴
