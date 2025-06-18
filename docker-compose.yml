@@ -65,7 +65,7 @@ services:
       - kafka
     environment:
       - TZ=Asia/Seoul
-    command: [ "java", "-Duser.timezone=Asia/Seoul", "-Dspring.profiles.active=prod", "-jar", "/app/curtaincall.jar" ]
+    command: [ "java", "-Duser.timezone=Asia/Seoul", "-jar", "/app/curtaincall.jar" ]
     networks:
       - curtaincall-net
 
@@ -89,14 +89,7 @@ services:
       - backend
     environment:
       - TZ=Asia/Seoul
-    command:
-      [
-        "java",
-        "-Duser.timezone=Asia/Seoul",
-        "-Dspring.profiles.active=prod",
-        "-jar",
-        "/app/scheduler.jar"
-      ]
+    command: [ "java", "-Duser.timezone=Asia/Seoul", "-jar", "/app/scheduler.jar" ]
     networks:
       - curtaincall-net
 

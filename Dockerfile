@@ -10,4 +10,4 @@ FROM openjdk:17-jdk-slim
 
 COPY --from=build /app/build/libs/curtaincall-0.0.1-SNAPSHOT.jar /app/curtaincall.jar
 
-CMD ["java", "-Dspring.profiles.active=prod", "-jar", "/app/curtaincall.jar"]
+#CMD ["java", "-jar", "/app/curtaincall.jar"]
