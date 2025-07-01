@@ -58,7 +58,6 @@ public class SpecialProductService {
         if (!keys.isEmpty()) {
             List<SpecialProductDto> cachedProducts = keys.stream()
                     .map(valueOps::get)
-                    .filter(Objects::nonNull)
                     .toList();
 
             if (!cachedProducts.isEmpty()) {
