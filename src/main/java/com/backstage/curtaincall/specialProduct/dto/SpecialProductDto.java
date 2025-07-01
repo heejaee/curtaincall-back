@@ -30,6 +30,7 @@ public class SpecialProductDto {
 
     // SpecialProduct 정보
     private Long specialProductId;
+    private boolean expiring;
 
     @Min(value = 0, message = "할인율은 {value}% 이상이어야 합니다.")
     @Max(value = 100, message = "할인율은 {value}% 이하이어야 합니다.")
