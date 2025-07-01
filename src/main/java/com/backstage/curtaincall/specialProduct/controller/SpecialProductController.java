@@ -2,14 +2,13 @@ package com.backstage.curtaincall.specialProduct.controller;
 
 import com.backstage.curtaincall.specialProduct.dto.SpecialProductDto;
 import com.backstage.curtaincall.specialProduct.handler.SpecialProductDeleteHandler;
+import com.backstage.curtaincall.specialProduct.handler.SpecialProductUpdateHandler;
 import com.backstage.curtaincall.specialProduct.scheduler.SchedulerService;
 import com.backstage.curtaincall.specialProduct.service.SpecialProductService;
-import com.backstage.curtaincall.specialProduct.handler.SpecialProductUpdateHandler;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
