@@ -20,7 +20,7 @@ public class SchedulerService {
     private final SpecialProductService specialProductService;
     private final SpecialProductDeleteHandler specialProductDeleteHandler;
 
-    @Transactional
+//    @Transactional
     public void deleteExpiredSpecialProducts() {
         LocalDate today = LocalDate.now();
 
@@ -30,7 +30,12 @@ public class SchedulerService {
         if (!expiredSpecialProductIds.isEmpty()) {
             // 2. 만료된 상품 삭제
             for (Long spId : expiredSpecialProductIds) {
-                specialProductDeleteHandler.delete(spId);
+                try {
+                    specialProductDeleteHandler.delete(spId);
+                } catch (Exception e) {
+                    // 실패한 상품은 넘어가고, 다른 상품은 계속 삭제하도록 처리
+                    log.warn("특가 상품 삭제 실패 (ID: {}), 이유: {}", spId, e.getMessage());
+                }
             }
         }
     }

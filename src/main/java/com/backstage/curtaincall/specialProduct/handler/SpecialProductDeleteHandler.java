@@ -19,6 +19,8 @@ public class SpecialProductDeleteHandler {
     // 단건 삭제
     public void delete(Long specialProductId) {
         SpecialProduct sp = specialProductService.findById(specialProductId);
+        log.info("spId:{}, 삭제 대상 상태: {}", specialProductId, sp.getStatus());
+
         if (sp.getStatus() == SpecialProductStatus.ACTIVE) {
             // 캐시 반영해서 삭제
             specialProductService.deleteWithCache(sp);

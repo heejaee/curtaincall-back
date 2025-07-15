@@ -8,6 +8,7 @@ import com.backstage.curtaincall.specialProduct.service.SpecialProductService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/specialProduct")
 @RequiredArgsConstructor
+@Slf4j
 public class SpecialProductController {
 
     private final SpecialProductService specialProductService;
@@ -87,6 +89,7 @@ public class SpecialProductController {
     // 만료된 특가상품 삭제
     @PostMapping("/deleteExpired")
     public void deleteExpiredSpecialProducts() {
+        log.info("만료된 특가 상품 삭제");
         schedulerService.deleteExpiredSpecialProducts();
     }
 
