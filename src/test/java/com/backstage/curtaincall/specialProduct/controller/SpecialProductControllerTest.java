@@ -163,7 +163,6 @@ class SpecialProductControllerTest {
                 .andExpect(jsonPath("$.productId", is(200)));
     }
 
-    //여기부터
     @Test
     @DisplayName("특가상품 수정 호출")
     void updateSpecialProduct() throws Exception {
