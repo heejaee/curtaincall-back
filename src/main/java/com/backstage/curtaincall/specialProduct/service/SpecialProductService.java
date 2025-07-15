@@ -155,6 +155,9 @@ public class SpecialProductService {
         return executeInTransaction(() -> {
             sp.delete();
             specialProductRepository.delete(sp);
+            // Redis 캐시 수동 삭제
+            String cacheKey = "specialProductCache::specialProduct:" + sp.getId();
+            redisTemplate.delete(cacheKey);
             return sp.toDto();
         });
     }
