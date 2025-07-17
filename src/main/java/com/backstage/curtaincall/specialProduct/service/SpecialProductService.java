@@ -80,7 +80,6 @@ public class SpecialProductService {
         return activeProductsDto;
     }
 
-
     // 이름 검색 및 페이지네이션을 적용한 전체 조회
     public Page<SpecialProductDto> getSpecialProducts(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -136,6 +135,7 @@ public class SpecialProductService {
         return executeInTransaction(() -> {
             sp.update(dto);
             specialProductRepository.update(dto);
+            //redisTemplate.opsForValue().set("specialProductCache::specialProduct:" + dto.getSpecialProductId(), sp.toDto());
             return sp.toDto();
         });
     }
