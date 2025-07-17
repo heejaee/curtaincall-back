@@ -137,7 +137,7 @@ class SpecialProductServiceTest {
 
     @Test
     @DisplayName("Redis 캐시에 데이터가 있을 때 ACTIVE 특가상품은 캐시에서 조회")
-    void getActiveSpecialProducts_cacheHit_success() {
+    void getActiveSpecialProducts_cacheHit() {
         // Given
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(redisTemplate.keys("specialProductCache::specialProduct:*"))
@@ -156,7 +156,7 @@ class SpecialProductServiceTest {
 
     @Test
     @DisplayName("Redis 캐시에 없을 때 ACTIVE 특가상품은 DB 조회 후 캐시 저장")
-    void getActiveSpecialProducts_cacheMiss_fallbackToDB() {
+    void getActiveSpecialProducts_cacheMiss() {
         // Given
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(redisTemplate.keys("specialProductCache::specialProduct:*"))
@@ -231,7 +231,7 @@ class SpecialProductServiceTest {
 
     @Test
     @DisplayName("상품이 존재하지 않으면 예외 발생")
-    void save_productNotFound_throwsException() {
+    void save_productNotFound() {
         // Given
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
