@@ -140,9 +140,9 @@ class SpecialProductServiceTest {
     void getActiveSpecialProducts_cacheHit() {
         // Given
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(redisTemplate.keys("specialProductCache::specialProduct:*"))
-                .thenReturn(Set.of("specialProductCache::specialProduct:99"));
-        when(valueOperations.get("specialProductCache::specialProduct:99"))
+        when(redisTemplate.keys("cache::specialProduct:*"))
+                .thenReturn(Set.of("cache::specialProduct:99"));
+        when(valueOperations.get("cache::specialProduct:99"))
                 .thenReturn(upCommingDto);
 
         // When
@@ -159,7 +159,7 @@ class SpecialProductServiceTest {
     void getActiveSpecialProducts_cacheMiss() {
         // Given
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(redisTemplate.keys("specialProductCache::specialProduct:*"))
+        when(redisTemplate.keys("cache::specialProduct:*"))
                 .thenReturn(Collections.emptySet());
         when(specialProductRepository.findAllActive()).thenReturn(List.of(upcommingSpecialProduct));
 
@@ -171,7 +171,7 @@ class SpecialProductServiceTest {
         //DB 조회됐는지 확인
         verify(specialProductRepository).findAllActive();
         // Redis에 저장했는지 확인
-        verify(valueOperations).set(eq("specialProductCache::specialProduct:" + upcommingSpecialProduct.getId()), any(), any());
+        verify(valueOperations).set(eq("cache::specialProduct:" + upcommingSpecialProduct.getId()), any(), any());
     }
 
     @Test
@@ -295,7 +295,7 @@ class SpecialProductServiceTest {
         // Then
         assertThat(result.getStatus()).isEqualTo(SpecialProductStatus.DELETED);
         verify(specialProductRepository).delete(upcommingSpecialProduct);
-        verify(redisTemplate).delete("specialProductCache::specialProduct:" + upcommingSpecialProduct.getId());
+        verify(redisTemplate).delete("cache::specialProduct:" + upcommingSpecialProduct.getId());
     }
 
     @Test

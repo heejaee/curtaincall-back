@@ -81,6 +81,8 @@ dependencies {
 	//테스트시 로그
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
+	//Redisson 락
+	implementation group: 'org.redisson', name: 'redisson-spring-boot-starter', version: '3.34.1'
 }
 
 tasks.named('test') {

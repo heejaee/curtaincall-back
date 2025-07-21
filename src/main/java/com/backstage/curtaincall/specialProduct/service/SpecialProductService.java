@@ -9,6 +9,7 @@ import com.backstage.curtaincall.product.entity.Product;
 import com.backstage.curtaincall.product.repository.ProductRepository;
 import com.backstage.curtaincall.specialProduct.dto.SpecialProductDto;
 import com.backstage.curtaincall.specialProduct.entity.SpecialProduct;
+import com.backstage.curtaincall.specialProduct.lock.DistributedLock;
 import com.backstage.curtaincall.specialProduct.repository.SpecialProductRepository;
 import com.backstage.curtaincall.specialProduct.validator.SpecialProductValidator;
 import java.time.Duration;
@@ -53,7 +54,7 @@ public class SpecialProductService {
         ValueOperations<String, SpecialProductDto> valueOps = redisTemplate.opsForValue();
 
         // Redis에서 모든 활성화된 특가 상품 키 가져오기
-        Set<String> keys = redisTemplate.keys("specialProductCache::specialProduct:*");
+        Set<String> keys = redisTemplate.keys("cache::specialProduct:*");
 
         if (!keys.isEmpty()) {
             List<SpecialProductDto> cachedProducts = keys.stream()
@@ -73,7 +74,7 @@ public class SpecialProductService {
 
         // Redis에 저장 (TTL 24시간 설정)
         for (SpecialProductDto dto : activeProductsDto) {
-            valueOps.set("specialProductCache::specialProduct:" + dto.getSpecialProductId(), dto, Duration.ofHours(24));
+            valueOps.set("cache::specialProduct:" + dto.getSpecialProductId(), dto, Duration.ofHours(24));
         }
 
 
@@ -102,6 +103,7 @@ public class SpecialProductService {
 
 
     // 단건 생성
+    @DistributedLock(key = "'product:' + #dto.productId")
     public SpecialProductDto save(SpecialProductDto dto) {
         // 통합 검증 메서드
         specialProductValidator.validateSave(dto);
@@ -130,17 +132,19 @@ public class SpecialProductService {
     }
 
     // 수정: 캐시 반영 O
-    @CachePut(cacheNames = "specialProductCache", key = "'specialProduct:' + #dto.specialProductId", cacheManager = "cacheManager")
+    @DistributedLock(key = "'specialProduct:' + #sp.id")
+    @CachePut(cacheNames = "cache", key = "'specialProduct:' + #dto.specialProductId", cacheManager = "cacheManager")
     public SpecialProductDto updateWithCache(SpecialProduct sp, SpecialProductDto dto) {
         return executeInTransaction(() -> {
             sp.update(dto);
             specialProductRepository.update(dto);
-            //redisTemplate.opsForValue().set("specialProductCache::specialProduct:" + dto.getSpecialProductId(), sp.toDto());
+            //redisTemplate.opsForValue().set("cache::specialProduct:" + dto.getSpecialProductId(), sp.toDto());
             return sp.toDto();
         });
     }
 
     // 수정: 캐시 업데이트 반영 X
+    @DistributedLock(key = "'specialProduct:' + #sp.id")
     public void updateWithOutCache(SpecialProduct sp, SpecialProductDto dto) {
         executeInTransaction(() -> {
             sp.update(dto);
@@ -150,19 +154,21 @@ public class SpecialProductService {
     }
 
     // Soft 삭제 : 캐시 반영 O
-    @CacheEvict(cacheNames = "specialProductCache", key = "'specialProduct:' + #sp.id", cacheManager = "cacheManager")
+    @DistributedLock(key = "'specialProduct:' + #sp.id")
+    @CacheEvict(cacheNames = "cache", key = "'specialProduct:' + #sp.id", cacheManager = "cacheManager")
     public SpecialProductDto deleteWithCache(SpecialProduct sp) {
         return executeInTransaction(() -> {
             sp.delete();
             specialProductRepository.delete(sp);
             // Redis 캐시 수동 삭제
-            String cacheKey = "specialProductCache::specialProduct:" + sp.getId();
+            String cacheKey = "cache::specialProduct:" + sp.getId();
             redisTemplate.delete(cacheKey);
             return sp.toDto();
         });
     }
 
     // Soft 삭제 : 캐시 반영 X
+    @DistributedLock(key = "'specialProduct:' + #sp.id")
     public void deleteWithOutCache(SpecialProduct sp) {
         executeInTransaction(() -> {
             sp.delete();
@@ -171,7 +177,8 @@ public class SpecialProductService {
         });
     }
 
-    @CachePut(cacheNames = "specialProductCache", key = "'specialProduct:' + #id", cacheManager = "cacheManager")
+    @DistributedLock(key = "'specialProduct:' + #id")
+    @CachePut(cacheNames = "cache", key = "'specialProduct:' + #id", cacheManager = "cacheManager")
     public SpecialProductDto approve(Long id) {
 
         return executeInTransaction(() -> {
@@ -190,7 +197,8 @@ public class SpecialProductService {
         });
     }
 
-    @CacheEvict(cacheNames = "specialProductCache", key = "'specialProduct:' + #id", cacheManager = "cacheManager")
+    @DistributedLock(key = "'specialProduct:' + #id")
+    @CacheEvict(cacheNames = "cache", key = "'specialProduct:' + #id", cacheManager = "cacheManager")
     public SpecialProductDto approveCancel(Long id) {
         return executeInTransaction(() -> {
             SpecialProduct sp = specialProductRepository.findByIdActive(id)
