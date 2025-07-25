@@ -147,6 +147,11 @@ public class SpecialProductService {
     @DistributedLock(key = "'specialProduct:' + #sp.id")
     public void updateWithOutCache(SpecialProduct sp, SpecialProductDto dto) {
         executeInTransaction(() -> {
+//            try {
+//                Thread.sleep(8000); // 테스트를 위한 인위적 지연
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
             sp.update(dto);
             specialProductRepository.update(dto);
             return null;

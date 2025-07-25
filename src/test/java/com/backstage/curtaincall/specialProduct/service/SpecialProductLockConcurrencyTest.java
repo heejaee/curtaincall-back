@@ -1,5 +1,7 @@
 package com.backstage.curtaincall.specialProduct.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.backstage.curtaincall.category.domain.Category;
 import com.backstage.curtaincall.category.repository.CategoryRepository;
 import com.backstage.curtaincall.product.entity.Product;
@@ -8,9 +10,20 @@ import com.backstage.curtaincall.product.repository.ProductImageRepository;
 import com.backstage.curtaincall.product.repository.ProductRepository;
 import com.backstage.curtaincall.specialProduct.dto.SpecialProductDto;
 import com.backstage.curtaincall.specialProduct.entity.SpecialProduct;
+import com.backstage.curtaincall.specialProduct.entity.SpecialProductStatus;
 import com.backstage.curtaincall.specialProduct.repository.SpecialProductRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +32,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-
-import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -50,19 +59,15 @@ public class SpecialProductLockConcurrencyTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
-    private EntityManager entityManager;
+    private SpecialProductDto dto;
 
-    @Test
-    @Transactional
-    @DisplayName("특가상품 저장 성공")
-    void saveSpecialProduct() {
-        // 카테고리 저장
+
+    @BeforeEach
+    void setUp() {
         Category category = categoryRepository.save(Category.builder()
                 .name("연극")
                 .build());
 
-        // 상품 저장
         Product product = productRepository.save(Product.builder()
                 .productName("테스트 상품")
                 .category(category)
@@ -84,33 +89,63 @@ public class SpecialProductLockConcurrencyTest {
         product.updateImage(image);  // 연관관계 설정
         productRepository.save(product); // product에 image 반영
 
-        // DTO 생성
-        SpecialProductDto baseDto = SpecialProductDto.of(product);
-        SpecialProductDto dto = SpecialProductDto.builder()
-                .productId(baseDto.getProductId())
-                .productName(baseDto.getProductName())
-                .price(baseDto.getPrice())
-                .startDate(baseDto.getStartDate())
-                .endDate(baseDto.getEndDate())
-                .place(baseDto.getPlace())
-                .runningTime(baseDto.getRunningTime())
-                .casting(baseDto.getCasting())
-                .notice(baseDto.getNotice())
-                .imageUrl(baseDto.getImageUrl())
+        dto = SpecialProductDto.builder()
+                .productId(product.getProductId())
                 .discountRate(20)
                 .discountStartDate(LocalDate.now().plusDays(1))
                 .discountEndDate(LocalDate.now().plusDays(3))
                 .build();
 
-        // when
-        SpecialProductDto saved = specialProductService.save(dto);
-        entityManager.flush();
-        entityManager.clear();
+        // DTO 생성
+        SpecialProductDto baseDto = SpecialProductDto.of(product);
+        dto = baseDto.toBuilder()
+                .discountRate(20)
+                .discountStartDate(LocalDate.now().plusDays(1))
+                .discountEndDate(LocalDate.now().plusDays(3))
+                .build();
 
-        // then
-        SpecialProduct result = specialProductRepository.findById(saved.getSpecialProductId())
-                .orElseThrow();
-        assertThat(result.getDiscountRate()).isEqualTo(20);
-        assertThat(result.getProduct().getProductImage().getImageUrl()).isEqualTo("http://test.com/test.jpg");
+    }
+
+    @Test
+    @DisplayName("동시에 여러 쓰레드가 updateWithOutCache를 호출하면 모두 동시에 성공하지는 않아야 한다")
+    void concurrencyTest_updateWithOutCache() throws InterruptedException {
+        // given
+        SpecialProductDto savedDto = specialProductService.save(dto);
+        SpecialProduct sp = specialProductRepository.findById(savedDto.getSpecialProductId()).orElseThrow();
+
+        int threadCount = 5;
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        AtomicInteger successCount = new AtomicInteger();
+
+        for (int i = 0; i < threadCount; i++) {
+            int threadNum = i;
+            executor.submit(() -> {
+                latch.countDown();
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+
+                try {
+                    SpecialProductDto updateDto = savedDto.toBuilder()
+                            .notice("공지사항 업데이트 - " + threadNum)
+                            .status(SpecialProductStatus.UPCOMING)
+                            .build();
+                    specialProductService.updateWithOutCache(sp, updateDto);
+                    successCount.incrementAndGet();
+                } catch (Exception ignored) {
+                }
+            });
+        }
+
+        executor.shutdown();
+        executor.awaitTermination(10, TimeUnit.SECONDS);
+
+        assertThat(successCount.get())
+                .as("동시 update 시 분산 락이 동작하여 모두 동시에 성공하면 안 됨")
+                .isLessThan(threadCount);
     }
 }

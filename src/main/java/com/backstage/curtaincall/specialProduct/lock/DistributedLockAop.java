@@ -38,6 +38,7 @@ public class DistributedLockAop {
             }
 
             // 락 획득 성공 후 비즈니스 로직 실행
+            log.info("락 획득 성공 - key: {}", key);
             return joinPoint.proceed();
 
         } finally {
