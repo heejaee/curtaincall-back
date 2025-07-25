@@ -6,6 +6,7 @@ import com.backstage.curtaincall.specialProduct.entity.SpecialProductStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import java.sql.PreparedStatement;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -188,25 +191,54 @@ public class SpecialProductRepository {
 //        em.persist(specialProduct);
 //    }
 
+
+//    public void save(SpecialProduct specialProduct) {
+//        jdbcTemplate.update("""
+//            INSERT INTO special_products (
+//                product_id,
+//                discount_rate,
+//                start_date,
+//                end_date,
+//                status
+//            ) VALUES (?, ?, ?, ?, ?)
+//        """,
+//                specialProduct.getProduct().getProductId(),
+//                specialProduct.getDiscountRate(),
+//                specialProduct.getStartDate(),
+//                specialProduct.getEndDate(),
+//                specialProduct.getStatus().name()
+//        );
+//    }
     private final JdbcTemplate jdbcTemplate;
 
     public void save(SpecialProduct specialProduct) {
-        jdbcTemplate.update("""
-            INSERT INTO special_products (
-                product_id,
-                discount_rate,
-                start_date,
-                end_date,
-                status
-            ) VALUES (?, ?, ?, ?, ?)
-        """,
-                specialProduct.getProduct().getProductId(),
-                specialProduct.getDiscountRate(),
-                specialProduct.getStartDate(),
-                specialProduct.getEndDate(),
-                specialProduct.getStatus().name()
-        );
+        String sql = """
+        INSERT INTO special_products (
+            product_id,
+            discount_rate,
+            start_date,
+            end_date,
+            status
+        ) VALUES (?, ?, ?, ?, ?)
+    """;
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"special_product_id"});
+            ps.setLong(1, specialProduct.getProduct().getProductId());
+            ps.setInt(2, specialProduct.getDiscountRate());
+            ps.setObject(3, specialProduct.getStartDate());
+            ps.setObject(4, specialProduct.getEndDate());
+            ps.setString(5, specialProduct.getStatus().name());
+            return ps;
+        }, keyHolder);
+
+        // 자동 생성된 ID를 엔티티에 주입
+        Long generatedId = keyHolder.getKey().longValue();
+        specialProduct.save(generatedId);
     }
+
 
     public void update(SpecialProductDto dto) {
         jdbcTemplate.update("""

@@ -111,6 +111,9 @@ public class SpecialProduct extends BaseEntity {
                 .build();
     }
 
+    public void save(Long id){
+        this.id =id;
+    }
 
     public void update(SpecialProductDto dto) {
         this.discountRate = dto.getDiscountRate();
