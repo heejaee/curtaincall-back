@@ -12,15 +12,10 @@ import com.backstage.curtaincall.specialProduct.dto.SpecialProductDto;
 import com.backstage.curtaincall.specialProduct.entity.SpecialProduct;
 import com.backstage.curtaincall.specialProduct.entity.SpecialProductStatus;
 import com.backstage.curtaincall.specialProduct.repository.SpecialProductRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
@@ -112,12 +107,14 @@ public class SpecialProductLockConcurrencyTest {
         // given
         SpecialProductDto savedDto = specialProductService.save(dto);
         SpecialProduct sp = specialProductRepository.findById(savedDto.getSpecialProductId()).orElseThrow();
+        // 테스트시  updateWithOutCache()에 Thread.sleep(8000)을 추가해야합니다!
 
         int threadCount = 5;
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(threadCount);
         AtomicInteger successCount = new AtomicInteger();
 
+        // when
         for (int i = 0; i < threadCount; i++) {
             int threadNum = i;
             executor.submit(() -> {
@@ -144,6 +141,7 @@ public class SpecialProductLockConcurrencyTest {
         executor.shutdown();
         executor.awaitTermination(10, TimeUnit.SECONDS);
 
+        // then
         assertThat(successCount.get())
                 .as("동시 update 시 분산 락이 동작하여 모두 동시에 성공하면 안 됨")
                 .isLessThan(threadCount);
