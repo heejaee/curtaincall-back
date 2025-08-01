@@ -7,6 +7,10 @@
 ***
 > 커튼콜은 공연의 마지막을 장식하는 **'커튼콜'** 처럼 예매의 시작과 끝을 책임지는 서비스라는 의미를 담고있는 B2C 서비스 입니다.
 
+## 📌 시스템 아키텍쳐
+***
+<img src="/assets/curtaincallDiagram.png">
+
 ## 🧩 ERD
 ***
 <img src="/assets/erd.png">
@@ -14,71 +18,6 @@
 ## ⛓ 와이어 프레임
 ***
 <img src="/assets/wire-frame.png">
-
-## 📌 프로젝트 구조
-***
-
-### 백엔드
-```
-src
-├── CurtaincallApplication.java
-├── category
-│   ├── controller
-│   ├── domain
-│   ├── dto
-│   ├── repository
-│   └── service
-├── chat
-│   ├── controller
-│   ├── document
-│   ├── dto
-│   ├── repository
-│   └── service
-├── global
-│   ├── config
-│   ├── entity
-│   └── exception
-├── ...
-```
-### 프론트엔드
-```
-src
-├── App.css
-├── App.jsx
-├── api
-│   ├── categoryApi.js
-│   ├── chatApi.js
-│   ├── faqApi.js
-│   ├── orderApi.js
-│   ├── paymentApi.js
-│   ├── productApi.js
-│   ├── specialProductApi.js
-│   └── userApi.js
-├── assets
-│   ├── favicon.png
-│   ├── hot.png
-│   └── img.png
-├── components
-│   ├── CancelBtn.jsx
-│   ├── category
-│   │   └── ...
-│   └── ...
-├── hooks
-│   ├── UseToggleActive.jsx
-│   └── UseUserRole.jsx
-├── index.css
-├── main.jsx
-├── pages
-│   ├── Home.jsx
-│   ├── inquiry
-│   │   └── ...
-│   ├── ...
-└── utils
-    ├── endpoint.js
-    ├── fetcher.js
-    └── webSocket.js
-
-```
 
 ## 🛠 기술 스택
 ***
@@ -112,9 +51,24 @@ src
 <img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
 <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
 
-## 🔥 주요기능
+## 🔥 내가 맡은 기능
 ***
 
+### 1. 특가상품
+
+|             특가상품              |
+|:-----------------------------:|
+| <img src="/assets/sale.png"/> |
+
+관리자가 특가상품을 등록하면 MySQL에 저장한 후, 해당 데이터를 Redis에 캐싱하여 빠른 조회가 가능하도록 처리하였습니다.
+* 5일 남은 특가상품은 타임딜시간이 보여집니다.
+
+<img src="/assets/timeDeal.png"/>
+
+### 2. 스케줄러
+매일 자정에 만료된 특가상품을 삭제하고, 오늘 시작하는 특가상품을 승인합니다.
+
+## 🔥 팀원이 맡은 기능
 ### 1. 회원
 
 |              회원가입                 |              권한 별 기능              |
@@ -199,10 +153,3 @@ src
     * 연관 상품 추천
         * 모든 사용자의 클릭 로그 저장 후 연쇄 클릭이 잦은 상품을 기반으로 제공
 
-### 특가상품
-
-|             특가상품              |
-|:-----------------------------:|
-| <img src="/assets/sale.png"/> |
-
-* 관리자가 특가상품을 등록 시 레디스에 값을 저장하여 캐싱된 값을 조회
