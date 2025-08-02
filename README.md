@@ -23,25 +23,25 @@
 ***
 
 ### 프론트 엔드
-![React](https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black)&nbsp;
-![JavaScript](https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)&nbsp;
+![React](https://img.shields.io/badge/React-18.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=black&labelColor=61DAFB&color=gray)&nbsp;
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black&labelColor=F7DF1E&color=gray)&nbsp;
 ![MUI](https://img.shields.io/badge/mui-007FFF?style=for-the-badge&logo=mui&logoColor=white)&nbsp;
 ![HTML5](https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white)&nbsp;
 ![CSS](https://img.shields.io/badge/Css-663399?style=for-the-badge&logo=css&logoColor=white)
 
 ### 백엔드
-![Spring](https://img.shields.io/badge/spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white)&nbsp;
-![Spring Boot](https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)&nbsp;
-![Spring Security](https://img.shields.io/badge/springsecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)&nbsp;
-![WebSocket](https://img.shields.io/badge/websocket-007396?style=for-the-badge&logo=websocket&logoColor=white)
+![Java](https://img.shields.io/badge/Java-17-007396?style=for-the-badge&logo=openjdk&logoColor=white&labelColor=007396&color=gray)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-3.4.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white&labelColor=6DB33F&color=gray)&nbsp;
+![Spring Security](https://img.shields.io/badge/Security-6.2.2-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white&labelColor=6DB33F&color=gray)&nbsp;
+![WebSocket](https://img.shields.io/badge/WebSocket-6.1.4-007396?style=for-the-badge&logo=websocket&logoColor=white&labelColor=007396&color=gray)
 
 ### 데이터베이스
-![MySQL](https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white)&nbsp;
-![MongoDB](https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=mongodb&logoColor=white)&nbsp;
-![Redis](https://img.shields.io/badge/redis-FF4438?style=for-the-badge&logo=redis&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white&labelColor=4479A1&color=gray)&nbsp;
+![MongoDB](https://img.shields.io/badge/MongoDB-6.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white&labelColor=47A248&color=gray)&nbsp;
+![Redis](https://img.shields.io/badge/Redis-7.0-FF4438?style=for-the-badge&logo=redis&logoColor=white&labelColor=FF4438&color=gray)
 
 ### 메시징
-![Kafka](https://img.shields.io/badge/apache%20kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white)
+![Kafka](https://img.shields.io/badge/Kafka-3.6.1-231F20?style=for-the-badge&logo=apachekafka&logoColor=white&labelColor=231F20&color=gray)
 
 ### 스토리지
 ![Amazon S3](https://img.shields.io/badge/amazons3-569A31?style=for-the-badge&logo=amazons3&logoColor=white)
@@ -49,7 +49,11 @@
 ### 배포 및 서버
 ![Nginx](https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)&nbsp;
 ![Docker](https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Amazon EC2](https://img.shields.io/badge/AWS-ec2-FF8C00?style=for-the-badge&logo=amazonec2)
 
+### IDE & 협업
+![IntelliJ](https://img.shields.io/badge/IntelliJ-ffa4c4?style=for-the-badge&logo=intellijidea&logoColor=white)&nbsp;
+![GitHub](https://img.shields.io/badge/GitHub-606060?style=for-the-badge&logo=github&logoColor=white)
 
 ## 🔥 내가 맡은 기능
 ***
