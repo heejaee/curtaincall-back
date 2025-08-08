@@ -219,6 +219,33 @@ public class SpecialProductRepositoryTest {
     }
 
     @Test
+    @DisplayName("findById는 DELETED가 아닌 경우만 반환")
+    void findById() {
+        SpecialProduct active = SpecialProduct.builder()
+                .product(product)
+                .discountRate(10)
+                .startDate(LocalDate.now().minusDays(1))
+                .endDate(LocalDate.now().plusDays(1))
+                .status(SpecialProductStatus.ACTIVE)
+                .build();
+        em.persist(active);
+
+        SpecialProduct deleted = SpecialProduct.builder()
+                .product(product)
+                .discountRate(20)
+                .startDate(LocalDate.now().minusDays(2))
+                .endDate(LocalDate.now().minusDays(1))
+                .status(SpecialProductStatus.DELETED)
+                .build();
+        em.persist(deleted);
+        em.flush(); em.clear();
+
+        assertThat(specialProductRepository.findById(active.getId())).isPresent();
+        assertThat(specialProductRepository.findById(deleted.getId())).isEmpty();
+    }
+
+
+    @Test
     @DisplayName("productId로 조회 시 DELETED 제외하고 반환")
     void findAllByProductId() {
         // given: 같은 productId로 두 건 저장 (하나는 DELETED, 하나는 UPCOMING)
