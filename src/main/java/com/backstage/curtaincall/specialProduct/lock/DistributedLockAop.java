@@ -31,7 +31,9 @@ public class DistributedLockAop {
 
         boolean isLocked = false;
         try {
-            isLocked = rLock.tryLock(lock.waitTime(), lock.leaseTime(), lock.timeUnit());
+            // leaseTime 제거 -> 와치독(Watchdog)을 활성화
+            // isLocked = rLock.tryLock(lock.waitTime(), lock.leaseTime(), lock.timeUnit());
+            isLocked = rLock.tryLock(lock.waitTime(), lock.timeUnit());
             if (!isLocked) {
                 log.warn("락 획득 실패 - key: {}", key);
                 throw new RuntimeException("분산 락 획득 실패: " + key); // 실패 시 명시적으로 예외

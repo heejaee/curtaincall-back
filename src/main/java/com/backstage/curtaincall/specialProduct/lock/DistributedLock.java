@@ -16,7 +16,8 @@ public @interface DistributedLock {
     /**
      * 락 임대 시간 (default - 3s)
      * 락을 획득한 이후 leaseTime 이 지나면 락을 해제한다
+     *  leaseTime 속성 제거: 와치독이 자동 연장을 담당하므로 더 이상 필요 X
      */
-    long leaseTime() default 3L;
+//    long leaseTime() default 3L;
     TimeUnit timeUnit() default TimeUnit.SECONDS; // 시간 단위: 초
 }
