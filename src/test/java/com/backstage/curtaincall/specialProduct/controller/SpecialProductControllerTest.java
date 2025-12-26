@@ -114,7 +114,7 @@ class SpecialProductControllerTest {
                         .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
-                .andExpect(jsonPath("$.page.totalElements", is(2))); // ← 여기 수정
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
 
     }
 
